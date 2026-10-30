@@ -1,12 +1,8 @@
 name: Build
 
 on:
-  push:
-    branches: [ "main" ]
-    paths-ignore: [ '**.md' ]
-  pull_request:
-    branches: [ "main" ]
-    paths-ignore: [ '**.md' ]
+  # Manual builds only: pushes to main do NOT auto-trigger (vivo fork policy).
+  # Run via Actions tab -> Build -> Run workflow when a zip is needed.
   workflow_dispatch:
 
 concurrency:
