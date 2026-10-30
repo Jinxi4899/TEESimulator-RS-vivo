@@ -1,0 +1,10 @@
+# Android module scripts must stay LF (shebang breaks with CRLF)
+module/** text eol=lf
+*.sh text eol=lf
+gradlew text eol=lf
+# Binary files
+*.png binary
+*.jar binary
+*.dex binary
+*.apk binary
+*.so binary
