@@ -104,6 +104,19 @@ fi
 if [ ! -f "$CONFIG_DIR/target.txt" ]; then
   ui_print "- Adding default target scope"
   install_file "target.txt" "$CONFIG_DIR"
+else
+  # Merge required packages into an existing target.txt so upgrades (where the
+  # file already exists and is therefore NOT overwritten above) still gain
+  # coverage for known detectors, without wiping user-maintained entries.
+  TARGET_MERGE="
+com.chunqiunativecheck
+"
+  for pkg in $TARGET_MERGE; do
+    if ! grep -q "^$pkg" "$CONFIG_DIR/target.txt" 2>/dev/null; then
+      echo "$pkg" >> "$CONFIG_DIR/target.txt"
+      ui_print "- Merged $pkg into existing target.txt"
+    fi
+  done
 fi
 
 if [ ! -f "$CONFIG_DIR/security_patch.txt" ]; then

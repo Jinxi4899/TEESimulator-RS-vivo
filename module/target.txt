@@ -9,3 +9,5 @@ io.github.qwq233.keyattestation
 com.android.nativetest
 io.liankong.riskdetector
 luna.safe.luna
+# 春秋检测器 (Chunqiu / Native check) — hide BL/root via hardware attestation spoof
+com.chunqiunativecheck

@@ -155,6 +155,29 @@ object AndroidDeviceUtils {
     }
 
     /**
+     * Resolves the resetprop binary to use.
+     *
+     * The root manager's native resetprop (KernelSU / APatch / Magisk) is required
+     * to override the read-only `bootloader_prop` properties (e.g.
+     * ro.boot.vbmeta.device_state). A bare `resetprop` on PATH is not available
+     * inside the module/daemon context, so we resolve the manager-specific path,
+     * falling back to a PATH lookup, then to a bare `resetprop`.
+     */
+    private fun resetpropBinary(): String {
+        val candidates = listOf(
+            "/data/adb/ksu/bin/resetprop",
+            "/data/adb/ap/bin/resetprop",
+            "/data/adb/magisk/resetprop"
+        )
+        for (cand in candidates) {
+            try {
+                if (File(cand).canExecute()) return cand
+            } catch (_: Exception) { /* ignore */ }
+        }
+        return "resetprop"
+    }
+
+    /**
      * Sets a system property using the `resetprop` command.
      *
      * @param name The name of the property to set.
@@ -162,9 +185,10 @@ object AndroidDeviceUtils {
      */
     private fun setProperty(name: String, bytes: ByteArray) {
         val hex = bytes.toHex()
+        val bin = resetpropBinary()
         try {
-            SystemLogger.debug("Setting system property '$name' to: $hex")
-            val command = arrayOf("resetprop", name, hex)
+            SystemLogger.debug("Setting system property '$name' to: $hex (via $bin)")
+            val command = arrayOf(bin, name, hex)
             val process = Runtime.getRuntime().exec(command)
             val exitCode = process.waitFor()
 
@@ -188,9 +212,10 @@ object AndroidDeviceUtils {
     }
 
     internal fun setProperty(name: String, value: String) {
+        val bin = resetpropBinary()
         try {
-            SystemLogger.debug("Setting system property '$name' to: $value")
-            val command = arrayOf("resetprop", name, value)
+            SystemLogger.debug("Setting system property '$name' to: $value (via $bin)")
+            val command = arrayOf(bin, name, value)
             val process = Runtime.getRuntime().exec(command)
             val exitCode = process.waitFor()
 
