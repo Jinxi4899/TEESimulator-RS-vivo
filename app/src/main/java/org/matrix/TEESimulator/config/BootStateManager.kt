@@ -118,6 +118,12 @@ object BootStateManager {
                 SystemProperties.get(name, "")
             }.lowercase()
 
-        return listOf("oneplus", "oplus", "oppo", "realme").any { joined.contains(it) }
+        // vivo fork extension: vivo/iQOO devices share the same ultrasonic fingerprint
+        // + vendor TEE calibration design as the Oplus family (BBK siblings), and are
+        // known to conflict with boot-state prop spoofing. Treat them the same way.
+        // Override with /data/adb/tricky_store/boot_props_mode = force if needed.
+        return listOf("oneplus", "oplus", "oppo", "realme", "vivo", "iqoo", "bbk").any {
+            joined.contains(it)
+        }
     }
 }
